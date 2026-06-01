@@ -1,0 +1,764 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PHY 102 – Electricity & Magnetism CBT</title>
+    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
+    <style>
+      :root {
+        --bg: #07101a;
+        --surface: #0c1825;
+        --card: #101e2e;
+        --border: #1e3a55;
+        --accent: #38bdf8;
+        --accent2: #f59e0b;
+        --danger: #ef4444;
+        --warn: #f97316;
+        --text: #daf0fb;
+        --muted: #4a7a9b;
+        --correct: #34d399;
+        --wrong: #ef4444;
+      }
+      * { box-sizing: border-box; margin: 0; padding: 0; }
+      body {
+        font-family: "Sora", sans-serif;
+        background: var(--bg);
+        color: var(--text);
+        min-height: 100vh;
+        overflow-x: hidden;
+      }
+      body::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        background:
+          radial-gradient(ellipse 60% 40% at 10% 5%, rgba(56,189,248,0.08) 0%, transparent 60%),
+          radial-gradient(ellipse 50% 50% at 90% 85%, rgba(245,158,11,0.05) 0%, transparent 60%);
+        pointer-events: none;
+        z-index: 0;
+      }
+      /* Lightning bolt background decoration */
+      body::after {
+        content: "⚡";
+        position: fixed;
+        font-size: 420px;
+        opacity: 0.018;
+        bottom: -60px;
+        right: -60px;
+        pointer-events: none;
+        z-index: 0;
+        line-height: 1;
+      }
+      .screen { display: none; position: relative; z-index: 1; }
+      .screen.active { display: flex; }
+
+      /* ── WELCOME ── */
+      #welcome {
+        min-height: 100vh;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 40px 20px;
+        text-align: center;
+      }
+      .logo-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        background: rgba(56,189,248,0.1);
+        border: 1px solid rgba(56,189,248,0.3);
+        border-radius: 100px;
+        padding: 8px 20px;
+        font-family: "JetBrains Mono", monospace;
+        font-size: 13px;
+        color: var(--accent);
+        margin-bottom: 32px;
+        letter-spacing: 0.05em;
+      }
+      .logo-badge::before {
+        content: "";
+        width: 8px; height: 8px;
+        border-radius: 50%;
+        background: var(--accent);
+        animation: blink 1.5s infinite;
+      }
+      @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.2} }
+      h1.title {
+        font-size: clamp(28px, 5vw, 52px);
+        font-weight: 800;
+        line-height: 1.1;
+        margin-bottom: 12px;
+        background: linear-gradient(135deg, #daf0fb 30%, var(--accent) 60%, var(--accent2));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+      }
+      .subtitle {
+        font-size: 15px;
+        color: var(--muted);
+        margin-bottom: 40px;
+        max-width: 520px;
+      }
+      .info-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 16px;
+        max-width: 540px;
+        width: 100%;
+        margin-bottom: 40px;
+      }
+      .info-card {
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        padding: 20px 16px;
+      }
+      .info-card .val {
+        font-size: 28px;
+        font-weight: 800;
+        color: var(--accent);
+        font-family: "JetBrains Mono", monospace;
+      }
+      .info-card .lbl {
+        font-size: 11px;
+        color: var(--muted);
+        margin-top: 4px;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+      }
+      .topics-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        justify-content: center;
+        max-width: 640px;
+        margin-bottom: 40px;
+      }
+      .topic-tag {
+        background: rgba(56,189,248,0.08);
+        border: 1px solid rgba(56,189,248,0.22);
+        border-radius: 100px;
+        padding: 5px 14px;
+        font-size: 11px;
+        color: var(--accent);
+      }
+      .start-btn {
+        background: linear-gradient(135deg, var(--accent), #0284c7);
+        border: none;
+        border-radius: 14px;
+        padding: 16px 48px;
+        font-family: "Sora", sans-serif;
+        font-size: 16px;
+        font-weight: 700;
+        color: #000;
+        cursor: pointer;
+        transition: transform 0.2s, box-shadow 0.2s;
+        box-shadow: 0 8px 32px rgba(56,189,248,0.35);
+      }
+      .start-btn:hover { transform: translateY(-2px); box-shadow: 0 12px 40px rgba(56,189,248,0.5); }
+
+      /* ── EXAM ── */
+      #exam { flex-direction: column; min-height: 100vh; }
+      .exam-header {
+        position: sticky; top: 0; z-index: 100;
+        background: rgba(7,16,26,0.93);
+        backdrop-filter: blur(12px);
+        border-bottom: 1px solid var(--border);
+        padding: 14px 24px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+      }
+      .course-tag {
+        font-family: "JetBrains Mono", monospace;
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--accent);
+        white-space: nowrap;
+      }
+      .progress-wrap { flex: 1; max-width: 400px; }
+      .progress-info {
+        display: flex;
+        justify-content: space-between;
+        font-size: 11px;
+        color: var(--muted);
+        margin-bottom: 6px;
+      }
+      .progress-bar { height: 4px; background: var(--border); border-radius: 100px; overflow: hidden; }
+      .progress-fill {
+        height: 100%;
+        background: linear-gradient(90deg, var(--accent), var(--accent2));
+        border-radius: 100px;
+        transition: width 0.4s ease;
+      }
+      .timer-box {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        padding: 8px 14px;
+        font-family: "JetBrains Mono", monospace;
+        font-size: 18px;
+        font-weight: 600;
+        transition: border-color 0.3s, color 0.3s;
+      }
+      .timer-box.warn { border-color: var(--warn); color: var(--warn); }
+      .timer-box.danger { border-color: var(--danger); color: var(--danger); animation: pulse 0.5s infinite; }
+      @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.5} }
+      .exam-body {
+        flex: 1;
+        padding: 32px 20px 120px;
+        max-width: 760px;
+        margin: 0 auto;
+        width: 100%;
+      }
+      .question-card {
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 18px;
+        padding: 28px;
+        margin-bottom: 20px;
+        animation: slideIn 0.3s ease;
+      }
+      @keyframes slideIn { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:none} }
+      .q-number {
+        font-family: "JetBrains Mono", monospace;
+        font-size: 11px;
+        color: var(--accent);
+        font-weight: 600;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        margin-bottom: 12px;
+      }
+      .q-topic {
+        display: inline-block;
+        font-size: 10px;
+        color: var(--muted);
+        background: rgba(56,189,248,0.07);
+        border: 1px solid rgba(56,189,248,0.15);
+        border-radius: 100px;
+        padding: 2px 10px;
+        margin-bottom: 10px;
+        letter-spacing: 0.06em;
+      }
+      .q-text { font-size: 16px; font-weight: 500; line-height: 1.65; color: var(--text); margin-bottom: 22px; }
+      .options { display: flex; flex-direction: column; gap: 10px; }
+      .option {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        background: var(--surface);
+        border: 1.5px solid var(--border);
+        border-radius: 12px;
+        padding: 14px 18px;
+        cursor: pointer;
+        transition: border-color 0.2s, background 0.2s, transform 0.15s;
+        user-select: none;
+      }
+      .option:hover { border-color: var(--accent); background: rgba(56,189,248,0.06); transform: translateX(3px); }
+      .option.selected { border-color: var(--accent); background: rgba(56,189,248,0.1); }
+      .opt-letter {
+        width: 30px; height: 30px;
+        border-radius: 8px;
+        display: flex; align-items: center; justify-content: center;
+        background: var(--border);
+        font-family: "JetBrains Mono", monospace;
+        font-size: 12px; font-weight: 700;
+        color: var(--muted);
+        flex-shrink: 0;
+        transition: background 0.2s, color 0.2s;
+      }
+      .option.selected .opt-letter { background: var(--accent); color: #000; }
+      .opt-text { font-size: 14px; line-height: 1.5; }
+      .exam-footer {
+        position: fixed; bottom: 0; left: 0; right: 0;
+        background: rgba(7,16,26,0.96);
+        backdrop-filter: blur(12px);
+        border-top: 1px solid var(--border);
+        padding: 16px 24px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        z-index: 100;
+      }
+      .nav-btn {
+        border: 1.5px solid var(--border);
+        background: var(--card);
+        color: var(--text);
+        border-radius: 10px;
+        padding: 10px 20px;
+        font-family: "Sora", sans-serif;
+        font-size: 14px; font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s;
+      }
+      .nav-btn:hover { border-color: var(--accent); color: var(--accent); }
+      .nav-btn:disabled { opacity: 0.3; cursor: default; }
+      .answered-count {
+        font-size: 13px; color: var(--muted);
+        font-family: "JetBrains Mono", monospace;
+      }
+      .submit-btn {
+        background: linear-gradient(135deg, var(--accent2), #d97706);
+        border: none;
+        border-radius: 10px;
+        padding: 10px 24px;
+        font-family: "Sora", sans-serif;
+        font-size: 14px; font-weight: 700;
+        color: #000;
+        cursor: pointer;
+        transition: transform 0.2s, box-shadow 0.2s;
+        box-shadow: 0 4px 16px rgba(245,158,11,0.3);
+      }
+      .submit-btn:hover { transform: translateY(-1px); }
+
+      /* ── RESULT ── */
+      #result {
+        min-height: 100vh;
+        flex-direction: column;
+        align-items: center;
+        justify-content: flex-start;
+        padding: 40px 20px 80px;
+      }
+      .result-header { text-align: center; margin-bottom: 36px; }
+      .score-circle {
+        width: 160px; height: 160px;
+        border-radius: 50%;
+        display: flex; flex-direction: column;
+        align-items: center; justify-content: center;
+        margin: 0 auto 24px;
+        position: relative;
+      }
+      .score-circle svg { position: absolute; inset: 0; transform: rotate(-90deg); }
+      .score-circle svg circle { fill: none; stroke-width: 8; }
+      .score-circle svg .track { stroke: var(--border); }
+      .score-circle svg .fill { transition: stroke-dashoffset 1.5s cubic-bezier(0.4,0,0.2,1); }
+      .score-inner { position: relative; z-index: 1; text-align: center; }
+      .score-val { font-size: 38px; font-weight: 800; font-family: "JetBrains Mono", monospace; }
+      .score-total { font-size: 13px; color: var(--muted); }
+      .grade-badge {
+        display: inline-block;
+        padding: 6px 20px;
+        border-radius: 100px;
+        font-size: 14px; font-weight: 700;
+        letter-spacing: 0.05em;
+        margin-bottom: 8px;
+      }
+      .result-title { font-size: 22px; font-weight: 700; margin-bottom: 4px; }
+      .result-sub { font-size: 14px; color: var(--muted); }
+      .stats-row {
+        display: grid;
+        grid-template-columns: repeat(3,1fr);
+        gap: 12px;
+        max-width: 520px;
+        width: 100%;
+        margin-bottom: 32px;
+      }
+      .stat-card {
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        padding: 18px 12px;
+        text-align: center;
+      }
+      .stat-card .sv { font-size: 26px; font-weight: 800; font-family: "JetBrains Mono", monospace; }
+      .stat-card .sl { font-size: 11px; color: var(--muted); margin-top: 4px; text-transform: uppercase; letter-spacing: 0.07em; }
+      .review-section { max-width: 760px; width: 100%; }
+      .review-title {
+        font-size: 16px; font-weight: 700;
+        margin-bottom: 16px;
+        color: var(--accent);
+        border-bottom: 1px solid var(--border);
+        padding-bottom: 10px;
+      }
+      .review-card {
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        padding: 20px;
+        margin-bottom: 12px;
+      }
+      .review-card.correct-card { border-color: rgba(52,211,153,0.4); }
+      .review-card.wrong-card { border-color: rgba(239,68,68,0.4); }
+      .review-q { font-size: 14px; font-weight: 500; line-height: 1.6; margin-bottom: 12px; }
+      .review-answers { display: flex; flex-direction: column; gap: 6px; }
+      .review-ans {
+        display: flex; align-items: center; gap: 10px;
+        font-size: 13px; padding: 8px 12px; border-radius: 8px;
+      }
+      .review-ans.correct-ans { background: rgba(52,211,153,0.1); color: var(--correct); }
+      .review-ans.wrong-ans { background: rgba(239,68,68,0.1); color: var(--wrong); }
+      .review-ans.neutral-ans { background: rgba(255,255,255,0.03); color: var(--muted); }
+      .retry-btn {
+        background: linear-gradient(135deg, var(--accent), #0284c7);
+        border: none; border-radius: 12px;
+        padding: 14px 36px;
+        font-family: "Sora", sans-serif;
+        font-size: 15px; font-weight: 700;
+        color: #000;
+        cursor: pointer;
+        margin-bottom: 32px;
+        transition: transform 0.2s, box-shadow 0.2s;
+        box-shadow: 0 6px 24px rgba(56,189,248,0.3);
+      }
+      .retry-btn:hover { transform: translateY(-2px); }
+      .modal-overlay {
+        display: none;
+        position: fixed; inset: 0;
+        background: rgba(0,0,0,0.75);
+        backdrop-filter: blur(8px);
+        z-index: 999;
+        align-items: center; justify-content: center;
+        padding: 20px;
+      }
+      .modal-overlay.open { display: flex; }
+      .modal {
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 20px;
+        padding: 32px;
+        max-width: 420px; width: 100%;
+        text-align: center;
+        animation: popIn 0.3s cubic-bezier(0.4,0,0.2,1);
+      }
+      @keyframes popIn { from{opacity:0;transform:scale(0.9)} to{opacity:1;transform:none} }
+      .modal h3 { font-size: 20px; font-weight: 700; margin-bottom: 10px; }
+      .modal p { font-size: 14px; color: var(--muted); margin-bottom: 24px; line-height: 1.6; }
+      .modal-btns { display: flex; gap: 12px; justify-content: center; }
+      .mbtn {
+        border-radius: 10px; padding: 11px 24px;
+        font-family: "Sora", sans-serif;
+        font-size: 14px; font-weight: 600;
+        cursor: pointer;
+        border: 1.5px solid var(--border);
+        transition: all 0.2s;
+      }
+      .mbtn.cancel { background: var(--surface); color: var(--text); }
+      .mbtn.cancel:hover { border-color: var(--accent); }
+      .mbtn.confirm { background: var(--accent2); color: #000; border-color: var(--accent2); }
+      .mbtn.confirm:hover { opacity: 0.85; }
+      @media (max-width: 600px) {
+        .exam-header { padding: 12px 16px; flex-wrap: wrap; gap: 10px; }
+        .exam-body { padding: 20px 14px 120px; }
+      }
+    </style>
+  </head>
+  <body>
+
+    <!-- WELCOME -->
+    <section class="screen active" id="welcome">
+      <div class="logo-badge">BOWEN UNIVERSITY · IWO</div>
+      <h1 class="title">Electricity &amp;<br />Magnetism</h1>
+      <p class="subtitle">PHY 102 CBT Examination — 40 questions in 35 minutes</p>
+      <div class="info-grid">
+        <div class="info-card"><div class="val">40</div><div class="lbl">Questions</div></div>
+        <div class="info-card"><div class="val">35</div><div class="lbl">Minutes</div></div>
+        <div class="info-card"><div class="val">40</div><div class="lbl">Marks</div></div>
+      </div>
+      <div class="topics-list">
+        <span class="topic-tag">Forces in Nature</span>
+        <span class="topic-tag">Electrostatics</span>
+        <span class="topic-tag">Methods of Charging</span>
+        <span class="topic-tag">Coulomb's Law</span>
+        <span class="topic-tag">Superposition Principle</span>
+        <span class="topic-tag">Electric Field</span>
+        <span class="topic-tag">Electric Potential</span>
+        <span class="topic-tag">Gauss's Law</span>
+        <span class="topic-tag">Capacitance</span>
+        <span class="topic-tag">Energy Density</span>
+        <span class="topic-tag">Electric Dipoles</span>
+        <span class="topic-tag">Conductors & Insulators</span>
+        <span class="topic-tag">Semiconductors</span>
+        <span class="topic-tag">Direct Current</span>
+        <span class="topic-tag">Parallel Plate Capacitors</span>
+        <span class="topic-tag">Series & Parallel Capacitors</span>
+        <span class="topic-tag">Dielectrics</span>
+        <span class="topic-tag">Transformers</span>
+       
+      </div>
+      <button class="start-btn" onclick="startExam()">Start Examination →</button>
+    </section>
+
+    <!-- EXAM -->
+    <section class="screen" id="exam">
+      <div class="exam-header">
+        <div class="course-tag">PHY 102</div>
+        <div class="progress-wrap">
+          <div class="progress-info">
+            <span id="qLabel">Question 1 of 40</span><span id="pctLabel">0%</span>
+          </div>
+          <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+        </div>
+        <div class="timer-box" id="timerBox">⏱ <span id="timerDisplay">35:00</span></div>
+      </div>
+      <div class="exam-body" id="examBody"></div>
+      <div class="exam-footer">
+        <button class="nav-btn" id="prevBtn" onclick="navigate(-1)" disabled>← Prev</button>
+        <div class="answered-count" id="answeredCount">0 / 40 answered</div>
+        <button class="nav-btn" id="nextBtn" onclick="navigate(1)">Next →</button>
+        <button class="submit-btn" onclick="confirmSubmit()">Submit Exam</button>
+      </div>
+    </section>
+
+    <!-- RESULT -->
+    <section class="screen" id="result">
+      <div class="result-header">
+        <div class="score-circle">
+          <svg viewBox="0 0 160 160" width="160" height="160">
+            <circle class="track" cx="80" cy="80" r="68"/>
+            <circle class="fill" id="scoreFill" cx="80" cy="80" r="68" stroke-dasharray="427" stroke-dashoffset="427"/>
+          </svg>
+          <div class="score-inner">
+            <div class="score-val" id="scoreVal">0</div>
+            <div class="score-total">out of 40</div>
+          </div>
+        </div>
+        <div class="grade-badge" id="gradeBadge">—</div>
+        <div class="result-title" id="resultTitle">—</div>
+        <div class="result-sub" id="resultSub">—</div>
+      </div>
+      <div class="stats-row">
+        <div class="stat-card"><div class="sv" id="correctCount" style="color:var(--correct)">0</div><div class="sl">Correct</div></div>
+        <div class="stat-card"><div class="sv" id="wrongCount" style="color:var(--wrong)">0</div><div class="sl">Wrong</div></div>
+        <div class="stat-card"><div class="sv" id="skipCount" style="color:var(--warn)">0</div><div class="sl">Skipped</div></div>
+      </div>
+      <button class="retry-btn" onclick="retryExam()">↺ Retake Exam</button>
+      <div class="review-section">
+        <div class="review-title">📋 Detailed Review</div>
+        <div id="reviewCards"></div>
+      </div>
+    </section>
+
+    <!-- MODAL -->
+    <div class="modal-overlay" id="modalOverlay">
+      <div class="modal">
+        <h3>Submit Examination?</h3>
+        <p id="modalMsg">Are you sure you want to submit?</p>
+        <div class="modal-btns">
+          <button class="mbtn cancel" onclick="closeModal()">Go Back</button>
+          <button class="mbtn confirm" onclick="submitExam()">Submit Now</button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const QUESTION_BANK = [
+
+        // ── FORCES IN NATURE ───────────────────────────────────────────────
+        { t:"Forces in Nature", q:"Which of the following is NOT one of the four fundamental forces in nature?", o:["Gravitational force","Electromagnetic force","Frictional force","Strong nuclear force"], a:2 },
+        { t:"Forces in Nature", q:"The force responsible for holding protons and neutrons together in the nucleus is the:", o:["Gravitational force","Weak nuclear force","Strong nuclear force","Electromagnetic force"], a:2 },
+        { t:"Forces in Nature", q:"Which fundamental force governs the interactions between electrically charged particles?", o:["Gravitational force","Strong nuclear force","Weak nuclear force","Electromagnetic force"], a:3 },
+        { t:"Forces in Nature", q:"The weakest of the four fundamental forces is:", o:["Electromagnetic force","Weak nuclear force","Strong nuclear force","Gravitational force"], a:3 },
+
+        // ── ELECTROSTATICS & METHODS OF CHARGING ──────────────────────────
+        { t:"Electrostatics", q:"Which of the following best describes electrostatics?", o:["Study of moving charges","Study of magnetic fields","Study of stationary electric charges","Study of nuclear reactions"], a:2 },
+        { t:"Electrostatics", q:"Like charges:", o:["Attract each other","Repel each other","Have no interaction","Cancel each other out"], a:1 },
+        { t:"Methods of Charging", q:"When a glass rod is rubbed with silk, the glass rod becomes:", o:["Negatively charged","Positively charged","Neutral","A conductor"], a:1 },
+        { t:"Methods of Charging", q:"Charging by induction involves:", o:["Direct contact with a charged object","Bringing a charged object near without touching","Rubbing two objects together","Heating a conductor"], a:1 },
+        { t:"Methods of Charging", q:"Grounding a charged conductor means:", o:["Insulating it from the earth","Connecting it to the earth to neutralise excess charge","Increasing its charge","Heating it"], a:1 },
+
+        // ── COULOMB'S LAW ──────────────────────────────────────────────────
+        { t:"Coulomb's Law", q:"Coulomb's Law states that the electrostatic force between two charges is proportional to:", o:["The sum of the charges","The product of the charges and inversely proportional to the square of their distance","The square of the charges","The distance between them"], a:1 },
+        { t:"Coulomb's Law", q:"The SI unit of electric charge is:", o:["Ampere","Volt","Coulomb","Farad"], a:2 },
+        { t:"Coulomb's Law", q:"If the distance between two charges is doubled while the charges remain unchanged, the electrostatic force becomes:", o:["Twice as large","Four times as large","Half as large","One-quarter as large"], a:3 },
+        { t:"Coulomb's Law", q:"The value of Coulomb's constant k (in free space) is approximately:", o:["6.67 × 10⁻¹¹ N·m²/C²","9 × 10⁹ N·m²/C²","8.85 × 10⁻¹² F/m","1.6 × 10⁻¹⁹ C"], a:1 },
+
+        // ── SUPERPOSITION PRINCIPLE ────────────────────────────────────────
+        { t:"Superposition Principle", q:"The superposition principle for electric forces states that:", o:["Forces between charges cancel each other","The total force on a charge is the vector sum of forces from all other charges","Charges can only experience one force at a time","Forces are scalar quantities"], a:1 },
+        { t:"Superposition Principle", q:"Three equal charges +q are placed at the corners of an equilateral triangle. The net force on any one charge due to the other two is:", o:["Zero","Directed toward the centre of the triangle","Directed away from the centre of the triangle","Directed toward one of the other charges"], a:2 },
+
+        // ── ELECTRIC FIELD ─────────────────────────────────────────────────
+        { t:"Electric Field", q:"The electric field E at a point is defined as:", o:["The force on a 1 C positive test charge placed at that point","The potential energy at that point","The total charge in the field","The work done per unit mass"], a:0 },
+        { t:"Electric Field", q:"The SI unit of electric field intensity is:", o:["Coulomb (C)","Newton (N)","Volt per metre (V/m) or N/C","Farad (F)"], a:2 },
+        { t:"Electric Field", q:"Electric field lines start from _______ charges and end on _______ charges.", o:["Negative; positive","Positive; negative","Positive; positive","Negative; negative"], a:1 },
+        { t:"Electric Field", q:"The electric field inside a hollow conductor at electrostatic equilibrium is:", o:["Maximum","Equal to the surface field","Zero","Infinite"], a:2 },
+
+        // ── ELECTRIC POTENTIAL & POTENTIAL ENERGY ─────────────────────────
+        { t:"Electric Potential", q:"Electric potential V at a point is defined as:", o:["Work done per unit charge to bring a positive test charge from infinity to that point","Force per unit charge","Charge per unit area","Energy per unit mass"], a:0 },
+        { t:"Electric Potential", q:"The SI unit of electric potential is:", o:["Coulomb","Ampere","Joule","Volt"], a:3 },
+        { t:"Electric Potential", q:"The relationship between electric field E and electric potential V is:", o:["E = V/q","E = −dV/dx","E = V × d","E = dV/dt"], a:1 },
+        { t:"Electric Potential", q:"The potential energy of a charge q at a point of potential V is:", o:["V/q","q²V","qV","q + V"], a:2 },
+        { t:"Electric Potential", q:"At equal distances from a positive point charge, the electric potential is:", o:["Zero","Constant (equipotential surface)","Maximum at the top","Different at different directions"], a:1 },
+
+        // ── GAUSS'S LAW ────────────────────────────────────────────────────
+        { t:"Gauss's Law", q:"Gauss's Law states that the total electric flux through a closed surface is equal to:", o:["The total charge outside the surface divided by ε₀","The electric field at the surface","The total enclosed charge divided by ε₀","The product of charge and distance"], a:2 },
+        { t:"Gauss's Law", q:"Electric flux Φ through a surface is defined as:", o:["Φ = E · A · sinθ","Φ = E · A · cosθ","Φ = E / A","Φ = A / E"], a:1 },
+        { t:"Gauss's Law", q:"Using Gauss's Law, the electric field outside a uniformly charged sphere of total charge Q at distance r is:", o:["E = kQ/r","E = kQ/r²","E = kQ²/r","E = kQ·r"], a:1 },
+
+        // ── ELECTRIC DIPOLES ───────────────────────────────────────────────
+        { t:"Electric Dipoles", q:"An electric dipole consists of:", o:["Two equal positive charges","Two equal negative charges","Two equal and opposite charges separated by a small distance","A single charge in an electric field"], a:2 },
+        { t:"Electric Dipoles", q:"The electric dipole moment p is defined as:", o:["p = q/d","p = qd","p = q + d","p = q²d"], a:1 },
+        { t:"Electric Dipoles", q:"A dipole placed in a uniform electric field experiences:", o:["A net force only","A torque only","Both a net force and a torque","Neither a net force nor a torque"], a:1 },
+
+        // ── CAPACITANCE ────────────────────────────────────────────────────
+        { t:"Capacitance", q:"Capacitance C is defined as:", o:["C = QV","C = V/Q","C = Q/V","C = Q²/V"], a:2 },
+        { t:"Capacitance", q:"The SI unit of capacitance is:", o:["Volt","Ohm","Henry","Farad"], a:3 },
+        { t:"Capacitance", q:"For a parallel plate capacitor with plate area A and separation d, the capacitance is:", o:["C = ε₀A/d","C = ε₀d/A","C = ε₀Ad","C = A/(ε₀d)"], a:0 },
+        { t:"Capacitance", q:"When capacitors are connected in parallel, the equivalent capacitance is:", o:["The reciprocal of the sum of reciprocals","Less than the smallest capacitor","The sum of all individual capacitances","The product divided by the sum"], a:2 },
+        { t:"Capacitance", q:"When capacitors are connected in series, the equivalent capacitance is:", o:["The sum of all capacitances","Greater than the largest capacitor","Given by 1/Ceq = 1/C₁ + 1/C₂ + …","C₁ × C₂ / (C₁ + C₂) only for more than two"], a:2 },
+
+        // ── ENERGY IN ELECTRIC FIELDS / ENERGY DENSITY ────────────────────
+        { t:"Energy Density", q:"The energy stored in a capacitor of capacitance C charged to voltage V is:", o:["U = CV","U = ½CV²","U = 2CV²","U = CV²"], a:1 },
+        { t:"Energy Density", q:"The energy density (energy per unit volume) of an electric field E is:", o:["u = ε₀E","u = ½ε₀E²","u = ε₀E²","u = E²/(2ε₀)"], a:1 },
+
+        // ── CONDUCTORS, INSULATORS & SEMICONDUCTORS ───────────────────────
+        { t:"Conductors & Insulators", q:"In a conductor at electrostatic equilibrium, excess charge resides:", o:["Uniformly throughout the volume","At the centre","On the outer surface","Deep inside the material"], a:2 },
+        { t:"Conductors & Insulators", q:"An insulator is a material that:", o:["Allows free flow of electrons","Has many free charge carriers","Does not allow free flow of charge","Conducts only at high temperatures"], a:2 },
+        { t:"Semiconductors", q:"The electrical conductivity of a semiconductor:", o:["Is always higher than that of metals","Increases with increasing temperature (in intrinsic semiconductors)","Decreases with increasing temperature","Is independent of temperature"], a:1 },
+
+        // ── DIRECT CURRENT ─────────────────────────────────────────────────
+        { t:"Direct Current", q:"Direct current (DC) is characterised by:", o:["Periodically reversing direction","Constant direction of charge flow","Sinusoidal variation with time","Zero average value"], a:1 },
+        { t:"Direct Current", q:"Ohm's Law states that (for an ohmic conductor at constant temperature):", o:["V = IR²","I = V²/R","V = IR","P = IV²"], a:2 },
+
+        // ── DIELECTRICS ────────────────────────────────────────────────────
+        { t:"Dielectrics", q:"Inserting a dielectric between the plates of a capacitor (at constant voltage) causes the capacitance to:", o:["Decrease","Remain unchanged","Increase by a factor equal to the dielectric constant κ","Become zero"], a:2 },
+        { t:"Dielectrics", q:"The dielectric constant κ of a material is always:", o:["Less than 1","Equal to 1","Greater than or equal to 1","Negative"], a:2 },
+
+        // ── TRANSFORMERS & LENZ'S LAW ──────────────────────────────────────
+        { t:"Transformers", q:"A step-up transformer increases voltage by having:", o:["More turns in the primary than the secondary","Fewer turns in the primary than the secondary","Equal turns in both coils","Iron-free cores"], a:1 },
+        { t:"Transformers", q:"The efficiency of a transformer is defined as:", o:["(Input power / Output power) × 100%","(Output power / Input power) × 100%","(Primary voltage / Secondary voltage) × 100%","(Secondary current / Primary current) × 100%"], a:1 },
+        { t:"Transformers", q:"In an ideal transformer, if the primary has N₁ turns and the secondary has N₂ turns, then:", o:["V₁/V₂ = N₂/N₁","V₁/V₂ = N₁/N₂","V₁ × N₁ = V₂ × N₂","V₁ + V₂ = N₁ + N₂"], a:1 },
+        { t:"Lenz's Law", q:"Lenz's Law states that the induced EMF opposes:", o:["The source voltage","The change in magnetic flux that produced it","The resistance of the circuit","The capacitance of the circuit"], a:1 },
+        { t:"Lenz's Law", q:"Lenz's Law is a consequence of the law of conservation of:", o:["Charge","Mass","Energy","Momentum"], a:2 },
+        { t:"Lenz's Law", q:"Faraday's Law states that the induced EMF is equal to:", o:["The rate of change of electric flux","The rate of change of magnetic flux (−dΦ/dt)","The product of current and resistance","The total charge divided by time"], a:1 },
+      ];
+
+      let questions=[], answers={}, currentQ=0, timerInterval=null, secondsLeft=35*60;
+      const TOTAL=40;
+
+      function shuffle(arr){
+        const a=[...arr];
+        for(let i=a.length-1;i>0;i--){
+          const j=Math.floor(Math.random()*(i+1));
+          [a[i],a[j]]=[a[j],a[i]];
+        }
+        return a;
+      }
+
+      function startExam(){
+        questions=shuffle(QUESTION_BANK).slice(0,TOTAL);
+        answers={}; currentQ=0; secondsLeft=35*60;
+        document.getElementById("welcome").classList.remove("active");
+        document.getElementById("exam").classList.add("active");
+        renderQuestion(); startTimer();
+      }
+
+      function startTimer(){
+        if(timerInterval) clearInterval(timerInterval);
+        updateTimerDisplay();
+        timerInterval=setInterval(()=>{
+          secondsLeft--;
+          updateTimerDisplay();
+          if(secondsLeft<=0){ clearInterval(timerInterval); submitExam(true); }
+        },1000);
+      }
+
+      function updateTimerDisplay(){
+        const m=Math.floor(secondsLeft/60), s=secondsLeft%60;
+        document.getElementById("timerDisplay").textContent=
+          `${String(m).padStart(2,"0")}:${String(s).padStart(2,"0")}`;
+        const box=document.getElementById("timerBox");
+        box.classList.remove("warn","danger");
+        if(secondsLeft<=60) box.classList.add("danger");
+        else if(secondsLeft<=300) box.classList.add("warn");
+      }
+
+      function renderQuestion(){
+        const q=questions[currentQ];
+        const pct=Math.round(((currentQ+1)/TOTAL)*100);
+        document.getElementById("qLabel").textContent=`Question ${currentQ+1} of ${TOTAL}`;
+        document.getElementById("pctLabel").textContent=`${pct}%`;
+        document.getElementById("progressFill").style.width=pct+"%";
+        document.getElementById("answeredCount").textContent=`${Object.keys(answers).length} / ${TOTAL} answered`;
+        document.getElementById("prevBtn").disabled=currentQ===0;
+        document.getElementById("nextBtn").disabled=currentQ===TOTAL-1;
+        const L=["A","B","C","D"];
+        document.getElementById("examBody").innerHTML=`
+          <div class="question-card">
+            <div class="q-number">QUESTION ${currentQ+1} OF ${TOTAL}</div>
+            <div class="q-topic">${q.t}</div>
+            <div class="q-text">${q.q}</div>
+            <div class="options">${q.o.map((o,i)=>`
+              <div class="option ${answers[currentQ]===i?"selected":""}" onclick="selectAnswer(${i})">
+                <div class="opt-letter">${L[i]}</div>
+                <div class="opt-text">${o}</div>
+              </div>`).join("")}</div>
+          </div>`;
+        window.scrollTo(0,0);
+      }
+
+      function selectAnswer(idx){ answers[currentQ]=idx; renderQuestion(); }
+      function navigate(dir){ currentQ=Math.max(0,Math.min(TOTAL-1,currentQ+dir)); renderQuestion(); }
+
+      function confirmSubmit(){
+        const u=TOTAL-Object.keys(answers).length;
+        if(u>0){
+          document.getElementById("modalMsg").textContent=
+            `You have ${u} unanswered question(s). Once submitted, you cannot change your answers.`;
+          document.getElementById("modalOverlay").classList.add("open");
+        } else submitExam();
+      }
+      function closeModal(){ document.getElementById("modalOverlay").classList.remove("open"); }
+
+      function submitExam(auto=false){
+        clearInterval(timerInterval); closeModal();
+        let correct=0,wrong=0,skipped=0;
+        questions.forEach((q,i)=>{
+          if(answers[i]===undefined) skipped++;
+          else if(answers[i]===q.a) correct++;
+          else wrong++;
+        });
+        const pct=Math.round((correct/TOTAL)*100);
+        let grade,color,title,sub;
+        if(pct>=70){grade="A";color="var(--correct)";title="Excellent!";sub="Outstanding performance!";}
+        else if(pct>=60){grade="B";color="#38bdf8";title="Very Good!";sub="Great effort. Keep it up!";}
+        else if(pct>=50){grade="C";color="#f59e0b";title="Good Pass";sub="You passed. Aim higher!";}
+        else if(pct>=45){grade="D";color="#f97316";title="Pass";sub="Marginal pass. Review the material.";}
+        else{grade="F";color="var(--wrong)";title="Did Not Pass";sub="Review your notes and try again.";}
+
+        document.getElementById("exam").classList.remove("active");
+        document.getElementById("result").classList.add("active");
+        window.scrollTo(0,0);
+        document.getElementById("scoreVal").textContent=correct;
+        document.getElementById("scoreVal").style.color=color;
+        const gb=document.getElementById("gradeBadge");
+        gb.textContent=`Grade: ${grade} · ${pct}%`;
+        gb.style.cssText+=`background:${color}22;color:${color};border:1px solid ${color}66`;
+        document.getElementById("resultTitle").textContent=title;
+        document.getElementById("resultSub").textContent=sub+(auto?" (Time expired)":"");
+        document.getElementById("correctCount").textContent=correct;
+        document.getElementById("wrongCount").textContent=wrong;
+        document.getElementById("skipCount").textContent=skipped;
+        const fill=document.getElementById("scoreFill");
+        fill.style.stroke=color;
+        setTimeout(()=>{ fill.style.strokeDashoffset=427-(pct/100)*427; },100);
+
+        const L=["A","B","C","D"];
+        document.getElementById("reviewCards").innerHTML=questions.map((q,i)=>{
+          const ua=answers[i],ic=ua===q.a,sk=ua===undefined;
+          return `<div class="review-card ${sk?"":ic?"correct-card":"wrong-card"}">
+            <div class="q-number" style="margin-bottom:4px">${sk?"⬜":ic?"✅":"❌"} QUESTION ${i+1}</div>
+            <div class="q-topic" style="display:inline-block;font-size:10px;color:var(--muted);background:rgba(56,189,248,0.07);border:1px solid rgba(56,189,248,0.15);border-radius:100px;padding:2px 10px;margin-bottom:8px">${q.t}</div>
+            <div class="review-q">${q.q}</div>
+            <div class="review-answers">${q.o.map((o,oi)=>{
+              let cls="neutral-ans",ic2="•";
+              if(oi===q.a){cls="correct-ans";ic2="✓";}
+              else if(oi===ua&&!ic){cls="wrong-ans";ic2="✗";}
+              return `<div class="review-ans ${cls}"><span>${ic2}</span> ${L[oi]}. ${o}</div>`;
+            }).join("")}</div>
+          </div>`;
+        }).join("");
+      }
+
+      function retryExam(){
+        document.getElementById("result").classList.remove("active");
+        document.getElementById("welcome").classList.add("active");
+        window.scrollTo(0,0);
+      }
+    </script>
+  </body>
+</html>
